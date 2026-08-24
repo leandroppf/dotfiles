@@ -1,0 +1,18 @@
+# ~/.aliases
+
+# bat: a pager-aware cat with syntax highlighting. The theme follows the system
+# appearance — `defaults read` exits non-zero in light mode, where AppleInterfaceStyle
+# is simply absent. Theme names are case-sensitive and an unknown one is ignored
+# silently, so "GitHub" must keep that exact spelling.
+if command -v bat >/dev/null 2>&1; then
+  alias cat="bat --theme=\$(defaults read -globalDomain AppleInterfaceStyle &> /dev/null && echo default || echo GitHub)"
+fi
+
+# eza: a modern ls. --no-time/--no-user keep the default listing narrow; ask for
+# them explicitly when you want them.
+if command -v eza >/dev/null 2>&1; then
+  alias ls="eza --color=always --long --git --icons=always --no-time --no-user"
+fi
+
+# Reload the shell without opening a new tab.
+alias reload="exec zsh -l"

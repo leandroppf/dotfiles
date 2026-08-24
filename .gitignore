@@ -1,0 +1,8 @@
+# Machine-local overrides live outside version control by design.
+*.local
+.secrets
+
+# Backups written by scripts/symlinks.sh
+*.backup-*
+
+.DS_Store

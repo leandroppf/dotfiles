@@ -1,0 +1,6 @@
+# ~/.paths — PATH entries, most specific first.
+
+# Installers that drop binaries in the user prefix: the `claude` CLI, the AWS
+# CLI v2 shim, pipx. Not on the default macOS PATH, which is the usual reason a
+# freshly installed tool reports "command not found" until the shell restarts.
+export PATH="$HOME/.local/bin:$PATH"

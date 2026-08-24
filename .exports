@@ -1,0 +1,11 @@
+# ~/.exports — environment variables.
+#
+# Nothing secret goes in this file: it is tracked in a public repository.
+# Credentials and per-machine values belong in ~/.zshrc.local.
+
+# The AWS profile the spaceship prompt displays and the CLI uses by default.
+# `awsmfa` writes short-lived STS credentials into this profile.
+export AWS_PROFILE=mfa
+
+# Keep less from clearing the screen on exit, and show colours.
+export LESS="-R -F -X"

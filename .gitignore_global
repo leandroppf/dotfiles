@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors
+.idea/
+*.swp
+
+# Local agent settings that should never be shared
+**/.claude/settings.local.json
