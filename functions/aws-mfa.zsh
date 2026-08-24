@@ -81,5 +81,50 @@ awsmfa() {
   aws configure set aws_secret_access_key "$secret" --profile "$AWSMFA_TARGET_PROFILE"
   aws configure set aws_session_token     "$token"  --profile "$AWSMFA_TARGET_PROFILE"
 
+  # Not a key the CLI knows about — it ignores unrecognised settings — but it
+  # gives awsmfa_status something to read. STS does not store the expiry
+  # anywhere the CLI can retrieve later, so if we do not record it here, the
+  # only way to discover the session died is to make a call and have it fail.
+  aws configure set x_session_expires "$expiry" --profile "$AWSMFA_TARGET_PROFILE"
+
   print "awsmfa: [$AWSMFA_TARGET_PROFILE] refreshed — expires $expiry"
+}
+
+# awsmfa_status — how much longer the current session is good for.
+#
+# Usage:  awsmfa_status          # human readable
+#         awsmfa_status --quiet  # no output; exit 0 if valid, 1 if expired/missing
+#
+# The quiet form is meant for scripts and prompts:
+#     awsmfa_status --quiet || awsmfa
+awsmfa_status() {
+  emulate -L zsh
+  local quiet=0
+  [[ $1 == (-q|--quiet) ]] && quiet=1
+
+  local expiry
+  expiry=$(aws configure get x_session_expires --profile "$AWSMFA_TARGET_PROFILE" 2>/dev/null)
+
+  if [[ -z $expiry ]]; then
+    (( quiet )) || print -u2 "awsmfa: no session recorded for [$AWSMFA_TARGET_PROFILE] — run awsmfa"
+    return 1
+  fi
+
+  # STS returns ISO-8601 UTC (2026-08-24T12:34:56+00:00). BSD date needs the
+  # offset stripped and an explicit input format; -u reads it as UTC.
+  local expiry_epoch now_epoch remaining
+  expiry_epoch=$(date -u -j -f "%Y-%m-%dT%H:%M:%S" "${expiry%%+*}" +%s 2>/dev/null) || {
+    (( quiet )) || print -u2 "awsmfa: could not parse recorded expiry '$expiry'"
+    return 1
+  }
+  now_epoch=$(date -u +%s)
+  remaining=$(( expiry_epoch - now_epoch ))
+
+  if (( remaining <= 0 )); then
+    (( quiet )) || print -u2 "awsmfa: [$AWSMFA_TARGET_PROFILE] expired $(( -remaining / 60 ))m ago — run awsmfa"
+    return 1
+  fi
+
+  (( quiet )) || print "awsmfa: [$AWSMFA_TARGET_PROFILE] valid for $(( remaining / 3600 ))h $(( remaining % 3600 / 60 ))m (until $expiry)"
+  return 0
 }

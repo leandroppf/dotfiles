@@ -33,8 +33,28 @@ Then set the iTerm2 fonts by hand — see [`terminal/iterm2`](terminal/iterm2).
 | `.spaceshiprc.zsh` | prompt configuration |
 | `.gitconfig`, `.gitignore_global` | git |
 | `functions/` | shell functions, linked to `~/.zsh_functions` |
+| `aws/` | annotated `~/.aws` templates (examples only, no real values) |
+| `docs/` | longer-form notes |
 | `Brewfile` | the CLI tools, fonts and apps |
 | `scripts/` | the steps `install.sh` runs |
+
+## AWS with enforced MFA
+
+Accounts that require MFA reject long-lived access keys outright, so the CLI has
+to trade them for a temporary MFA-backed session first. `awsmfa` does that in one
+command, and `awsmfa_status` says how long is left:
+
+```console
+$ awsmfa
+MFA code for your.name: 123456
+awsmfa: [mfa] refreshed — expires 2026-08-24T22:13:41+00:00
+
+$ awsmfa_status
+awsmfa: [mfa] valid for 7h 41m (until 2026-08-24T22:13:41+00:00)
+```
+
+Full walkthrough, including the one-time IAM setup and the gotchas:
+**[docs/aws-mfa.md](docs/aws-mfa.md)**.
 
 ## Machine-local configuration
 

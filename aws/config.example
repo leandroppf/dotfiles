@@ -1,0 +1,28 @@
+# Example ~/.aws/config for an account that requires MFA.
+#
+# Copy to ~/.aws/config and replace the placeholders. This file is an example
+# only — the real ~/.aws/config is never tracked here, because an MFA ARN
+# contains your account id.
+#
+# See docs/aws-mfa.md for the full walkthrough.
+
+# The profile holding your long-lived IAM user access keys. On an MFA-enforced
+# account these keys can do almost nothing on their own — their one job is to
+# call sts:GetSessionToken and trade themselves for temporary credentials.
+[default]
+region = us-west-2
+output = json
+
+# The virtual MFA device to prompt against. `awsmfa` reads the serial from
+# here, which is why the account id does not need to be hardcoded in the
+# function. Find yours with:
+#     aws iam list-mfa-devices --query 'MFADevices[].SerialNumber' --output text
+#
+# 111122223333 is AWS's documentation placeholder account id.
+mfa_serial = arn:aws:iam::111122223333:mfa/your.name
+
+# The profile `awsmfa` writes temporary credentials into, and the one
+# AWS_PROFILE points at in .exports. Nothing is stored here by hand:
+# awsmfa fills in the key, secret, session token and expiry.
+[profile mfa]
+region = us-west-2

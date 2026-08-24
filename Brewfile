@@ -11,6 +11,9 @@ brew "eza"              # modern ls (see .aliases)
 brew "fzf"              # fuzzy finder; the oh-my-zsh fzf plugin wires up ^R and ^T
 brew "aria2"            # parallel downloader
 
+# ── cloud ───────────────────────────────────────────────────────────────────
+brew "awscli"           # see docs/aws-mfa.md for the MFA workflow
+
 # ── git ──────────────────────────────────────────────────────────────────────
 brew "gh"               # GitHub CLI; also acts as the git credential helper
 brew "git-lfs"
