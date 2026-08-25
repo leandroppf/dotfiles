@@ -11,7 +11,10 @@
 
 : ${AWSMFA_SOURCE_PROFILE:=default}
 : ${AWSMFA_TARGET_PROFILE:=mfa}
-: ${AWSMFA_DURATION:=43200}   # 12h, the get-session-token default
+# 36h, the maximum GetSessionToken allows for IAM user credentials (the API
+# default is 12h). Asking for more is rejected outright. Root credentials are
+# capped at 1h instead, but you should not be using those here anyway.
+: ${AWSMFA_DURATION:=129600}
 
 # Set this in ~/.zshrc.local if an account registers a U2F key as its mfa_serial
 # (see the u2f branch below). Empty here on purpose: an ARN embeds an account ID.

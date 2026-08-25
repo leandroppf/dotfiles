@@ -32,7 +32,7 @@ So two profiles, with different jobs:
 ~/.aws/credentials
 ├── [default]  long-lived IAM keys. Nearly powerless. Only job: call GetSessionToken.
 └── [mfa]      temporary keys + session token. What you actually work with.
-                Expires (12h by default). Rewritten by awsmfa.
+                Expires (36h here). Rewritten by awsmfa.
 ```
 
 `AWS_PROFILE=mfa` is exported in [`.exports`](../.exports), so every `aws`
@@ -94,13 +94,31 @@ $ aws s3 ls
 2026-03-14 09:22:10 my-bucket
 ```
 
-Non-interactively, pass the code (and optionally a duration in seconds, up to
-129600 = 36h):
+Non-interactively, pass the code, and optionally a duration in seconds:
 
 ```sh
 awsmfa 123456
-awsmfa 123456 129600
+awsmfa 123456 3600     # a short-lived session instead
 ```
+
+### Session length
+
+`AWSMFA_DURATION` defaults to `129600` — 36 hours, which is the **maximum**
+`GetSessionToken` permits for IAM user credentials. The API's own default is
+43200 (12h); 36h is chosen here so a session comfortably outlives a working day
+and you are not re-entering a code mid-afternoon. Anything above the cap is
+rejected with `ValidationError`, and root account credentials are limited to 1h
+regardless.
+
+Override it per call or per shell:
+
+```sh
+awsmfa 123456 3600                  # this session only
+export AWSMFA_DURATION=43200        # back to 12h for this shell
+```
+
+A longer session is a longer window in which a stolen `~/.aws/credentials` is
+usable, so it is a convenience/exposure trade rather than a free win.
 
 Check what is left without making a call that might fail:
 
